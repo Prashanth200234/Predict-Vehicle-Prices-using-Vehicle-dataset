@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Price Prediction</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            text-align: center;
+            padding: 30px;
+            color: white;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            width: 50%;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            color: black;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        label {
+            width: 80%;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: left;
+        }
+        select, input {
+            padding: 10px;
+            width: 60%;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px;
+            background: #ff5f6d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 18px;
+            width: 60%;
+            font-weight: bold;
+            transition: 0.3s ease;
+        }
+        button:hover {
+            background: #ff9966;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+    <script>
+        async function predictPrice() {
+            const formData = {
+                make: document.getElementById("make").value,
+                model: document.getElementById("model").value,
+                engine: document.getElementById("engine").value,
+                cylinders: parseInt(document.getElementById("cylinders").value), 
+                fuel: document.getElementById("fuel").value,
+                mileage: parseInt(document.getElementById("mileage").value), 
+                transmission: document.getElementById("transmission").value,
+                trim: document.getElementById("trim").value,
+                body: document.getElementById("body").value,
+                doors: parseInt(document.getElementById("doors").value),
+                drivetrain: document.getElementById("drivetrain").value,
+                vehicle_age: parseInt(document.getElementById("vehicle_age").value)
+            };
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                if (result.predicted_price !== undefined) {
+                    document.getElementById("result").innerText = "Predicted Price: $" + result.predicted_price;
+                } else {
+                    document.getElementById("result").innerText = "Error: No price returned.";
+                }
+            } catch (error) {
+                document.getElementById("result").innerText = "Error: Could not fetch prediction.";
+            }
+        }
+        
+        function resetForm() {
+            document.getElementById("predictForm").reset();
+            document.getElementById("result").innerText = "";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>🚗 Vehicle Price Prediction</h2>
+        <form id="predictForm" onsubmit="event.preventDefault(); predictPrice();">
+            <label>Make:
+                <select id="make">
+                    <option value="15">Jeep</option>
+                    <option value="9">GMC</option>
+                    <option value="19">Ford</option>
+                    <option value="20">Hyundai</option>
+                    <option value="5">Dodge</option>
+                </select>
+            </label>
+
+            <label>Model:
+                <select id="model">
+                    <option value="139">Wagoneer</option>
+                    <option value="148">Yukon XL</option>
+                    <option value="56">Grand Cherokee</option>
+                    <option value="2">Durango</option>
+                    <option value="22">F-350</option>
+                </select>
+            </label>
+
+            <label>Engine:
+                <select id="engine">
+                    <option value="24">24V GDI DOHC Twin Turbo</option>
+                    <option value="16">16V MPFI OHV</option>
+                    <option value="6">6.2L V-8 gasoline direct injection</option>
+                </select>
+            </label>
+
+            <label>Cylinders: <input type="number" id="cylinders" required></label>
+
+            <label>Fuel:
+                <select id="fuel">
+                    <option value="4">Gasoline</option>
+                    <option value="1">Diesel</option>
+                    <option value="2">Hybrid</option>
+                </select>
+            </label>
+
+            <label>Mileage: <input type="number" id="mileage" required></label>
+
+            <label>Transmission:
+                <select id="transmission">
+                    <option value="19">Automatic</option>
+                    <option value="3">Manual</option>
+                </select>
+            </label>
+
+            <label>Trim:
+                <select id="trim">
+                    <option value="6">Series II</option>
+                    <option value="2">Laredo</option>
+                    <option value="4">Denali</option>
+                </select>
+            </label>
+
+            <label>Body:
+                <select id="body">
+                    <option value="4">SUV</option>
+                    <option value="2">Pickup Truck</option>
+                </select>
+            </label>
+
+            <label>Doors:
+                <select id="doors">
+                    <option value="2">2 Doors</option>
+                    <option value="4">4 Doors</option>
+                </select>
+            </label>
+
+            <label>Drivetrain:
+                <select id="drivetrain">
+                    <option value="1">Four-wheel Drive</option>
+                    <option value="2">Rear-wheel Drive</option>
+                    <option value="3">All-wheel Drive</option>
+                </select>
+            </label>
+
+            <label>Vehicle Age: <input type="number" id="vehicle_age" required></label>
+
+            <button type="submit">🔮 Predict Price</button>
+            <button type="button" onclick="resetForm()">🔄 Reset</button>
+        </form>
+        <p id="result"></p>
+    </div>
+</body>
+</html>
